@@ -1,0 +1,11 @@
+$primary-color: rgb(36, 90, 53);
+$secondary-color: rgb(151, 71, 143);
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: lightblue;
+}
+
+h1 {
+  color: $primary-color;
+}
