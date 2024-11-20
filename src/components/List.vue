@@ -13,7 +13,7 @@
       <p>{{ market.introduction }}</p>
       <img v-if="market.images.length > 0" :src="market.images[0].src" alt="市場圖片" />
     </div> -->
-    <div>
+    <div class="list_select">
       <label for="category">選擇類別:</label>
       <select v-model="selectedCategoryId" id="category">
         <option value="">全部</option>
@@ -3316,6 +3316,10 @@
     right: 7.2rem;
     top: 1.8rem;
     font-size: 1.1rem;
+  }
+  .list_select{
+    margin-left: 8%;
+    margin-bottom: 1.5rem;
   }
   .list_title{
     text-align: center;
