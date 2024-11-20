@@ -46,16 +46,10 @@
             <input
               type="checkbox"
               :value="market.id"
-            />
-          </td>
-          <!-- <td>
-            <input
-              type="checkbox"
-              :value="market.id"
               :checked="isChecked(market.id)"
               @change="handleCheckboxChange(market.id)"
             />
-          </td> -->
+          </td>
           <td>
             <img
               v-if="market.images.length > 0"
@@ -3286,7 +3280,21 @@
       shortenText(text, length) {
         if (!text) return '';
         return text.length > length ? text.slice(0, length) + '...' : text;
+      },
+      isChecked(marketId) {
+        const selectedMarkets = JSON.parse(localStorage.getItem('selectedMarkets')) || [];
+        return selectedMarkets.includes(marketId);
+      },
+      handleCheckboxChange(marketId) {
+      const selectedMarkets = JSON.parse(localStorage.getItem('selectedMarkets')) || [];
+      if (selectedMarkets.includes(marketId)) {
+        const updatedMarkets = selectedMarkets.filter(id => id !== marketId);
+        localStorage.setItem('selectedMarkets', JSON.stringify(updatedMarkets));
+      } else {
+        selectedMarkets.push(marketId);
+        localStorage.setItem('selectedMarkets', JSON.stringify(selectedMarkets));
       }
+  }
     },
     mounted() {
       // axios.get(`${this.corsURL}${this.apiURL}`, { params: this.params })
