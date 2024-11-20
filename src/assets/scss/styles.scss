@@ -1,5 +1,6 @@
 $primary-color: rgb(36, 90, 53);
 $secondary-color: rgb(151, 71, 143);
+$tertiary-color: rgb(13, 56, 106);
 
 body {
   font-family: 'Arial', sans-serif;
@@ -11,14 +12,22 @@ h1 {
 }
 table{
   width: 85%;
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%);
+  height: 100%;
+  margin: 0 auto;
+  border-collapse: collapse;
 }
 tr{
   text-align: center;
   th{
     white-space: nowrap;
     padding: 8px;
+    color: $tertiary-color;
+    font-weight: 600;
   }
+}
+tr:hover {
+  background-color: rgb(247, 225, 158);
+}
+.table_title:hover{
+  background-color: transparent;
 }
