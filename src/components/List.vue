@@ -1,6 +1,10 @@
 <template>
   <div>
     <h1 class="list_title">資料列表</h1>
+    <div class="page_link">
+      <RouterLink class="router" to="/" >首頁</RouterLink> |
+      <RouterLink class="router" to="/favorite">我的最愛列表</RouterLink>
+    </div>
     <!-- <div v-for="market in fake_res.data" :key="market.id" class="market-card">
       <h2>{{ market.name }}</h2>
       <p>地址: {{ market.address }}</p>
@@ -9,6 +13,18 @@
       <p>{{ market.introduction }}</p>
       <img v-if="market.images.length > 0" :src="market.images[0].src" alt="市場圖片" />
     </div> -->
+    <div>
+      <label for="category">選擇類別:</label>
+      <select v-model="selectedCategoryId" id="category">
+        <option value="">全部</option>
+        <option v-for="category in categories" 
+          :key="category.index" 
+          :value="category.id"
+        >
+          {{ category.name }}
+        </option>
+      </select>
+    </div>
     <table class="list_table">
       <thead>
         <tr class="table_title">
@@ -23,7 +39,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="market in paginatedData"
+          v-for="market in filteredData"
           :key="market.id"
         >
           <td>
@@ -3212,6 +3228,32 @@
           }
         ]
       });
+      const categories = ref([
+        { id: 12, name: "單車遊蹤" },
+        { id: 13, name: "歷史建築" },
+        { id: 14, name: "宗教信仰" },
+        { id: 15, name: "藝文館所" },
+        { id: 16, name: "戶外踏青" },
+        { id: 17, name: "藍色水路" },
+        { id: 18, name: "公共藝術" },
+        { id: 19, name: "親子共遊" },
+        { id: 21, name: "101亮點" },
+        { id: 22, name: "借問站" },
+        { id: 23, name: "觀光夜市" },
+        { id: 24, name: "主題商街" },
+        { id: 25, name: "無障礙旅遊推薦" }
+      ]);
+      const selectedCategoryId = ref("");
+      const filteredData = computed(() => {
+      if (!selectedCategoryId.value) {
+        return fake_res.value.data || []; //未選擇
+      }
+      const selectedCategoryIdNum = parseInt(selectedCategoryId.value); //確認類別相同
+      //返回類別對應資料
+      return fake_res.value.data.filter(item => 
+        item.category.some(cat => cat.id === selectedCategoryIdNum)
+      );
+    });
       const pageSize = ref(10); //每頁筆數
       const currentPage = ref(1); //預設頁面
       //總頁數
@@ -3224,13 +3266,16 @@
         if (!Array.isArray(fake_res.value.data)) {
           return [];
         }
-        const startIndex = (currentPage.value - 1) * pageSize.value;
-        const endIndex = Math.min(startIndex + pageSize.value, fake_res.value.data.length);
+      const startIndex = (currentPage.value - 1) * pageSize.value;
+      const endIndex = Math.min(startIndex + pageSize.value, fake_res.value.data.length);
         return fake_res.value.data.slice(startIndex, endIndex);
       });
 
       return {
         fake_res,
+        categories,
+        selectedCategoryId,
+        filteredData,
         pageSize,
         currentPage,
         totalPages,
@@ -3258,6 +3303,12 @@
 </script>
 
 <style scoped lang="scss">
+  .page_link{
+    position: absolute;
+    right: 7.2rem;
+    top: 1.8rem;
+    font-size: 1.1rem;
+  }
   .list_title{
     text-align: center;
     font-weight: 1.2rem;
