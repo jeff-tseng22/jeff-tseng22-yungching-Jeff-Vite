@@ -9,3 +9,16 @@ body {
 h1 {
   color: $primary-color;
 }
+table{
+  width: 85%;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+}
+tr{
+  text-align: center;
+  th{
+    white-space: nowrap;
+    padding: 8px;
+  }
+}

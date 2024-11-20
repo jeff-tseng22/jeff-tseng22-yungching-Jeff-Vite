@@ -1,14 +1,62 @@
 <template>
   <div>
     <h1 class="list_title">資料列表</h1>
-    <div v-for="market in fake_res.data" :key="market.id" class="market-card">
+    <!-- <div v-for="market in fake_res.data" :key="market.id" class="market-card">
       <h2>{{ market.name }}</h2>
-      <p><strong>地址:</strong> {{ market.address }}</p>
-      <p><strong>電話:</strong> {{ market.tel }}</p>
-      <p><strong>營業時間:</strong> {{ market.open_time }}</p>
+      <p>地址: {{ market.address }}</p>
+      <p>電話: {{ market.tel }}</p>
+      <p>營業時間: {{ market.open_time }}</p>
       <p>{{ market.introduction }}</p>
       <img v-if="market.images.length > 0" :src="market.images[0].src" alt="市場圖片" />
-    </div>
+    </div> -->
+    <table>
+      <thead>
+        <tr>
+          <th>收藏</th>
+          <th>圖片</th>
+          <th>名稱</th>
+          <th>簡介</th>
+          <th>地址</th>
+          <th>電話</th>
+          <th>營業時間</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 根據篩選條件渲染數據 -->
+        <tr
+          v-for="market in fake_res.data"
+          :key="market.id"
+        >
+          <td>
+            <input
+              type="checkbox"
+              :value="market.id"
+            />
+          </td>
+          <!-- <td>
+            <input
+              type="checkbox"
+              :value="market.id"
+              :checked="isChecked(market.id)"
+              @change="handleCheckboxChange(market.id)"
+            />
+          </td> -->
+          <td>
+            <img
+              v-if="market.images.length > 0"
+              :src="market.images[0].src"
+              alt="市場圖片"
+              class="market-image"
+            />
+          </td>
+          <td>{{ market.name }}</td>
+          <td class="introduction">{{ shortenText(market.introduction, 50) }}</td>
+          <td>{{ market.address }}</td>
+          <td>{{ market.tel }}</td>
+          <td class="open_time">{{ market.open_time }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -18,12 +66,12 @@
     name: 'List',
     data() {
       return {
-        corsURL: 'https://cors-anywhere.herokuapp.com/',
-        url: 'https://www.travel.taipei/open-api/zh-tw/Attractions/All',
-        params: {
-          page: 1,
-          lang: 'zh-tw'
-        },
+        // corsURL: 'https://cors-anywhere.herokuapp.com/',
+        // url: 'https://www.travel.taipei/open-api/zh-tw/Attractions/All',
+        // params: {
+        //   page: 1,
+        //   lang: 'zh-tw'
+        // },
         fake_res: {
           "total": 485,
           "data": [
@@ -3161,6 +3209,12 @@
         }
       };
     },
+    methods: {
+      shortenText(text, length) {
+        if (!text) return '';
+        return text.length > length ? text.slice(0, length) + '...' : text;
+      }
+    },
     mounted() {
       // axios.get(`${this.corsURL}${this.apiURL}`, { params: this.params })
       // .then(res => {
@@ -3179,5 +3233,18 @@
   .list_title{
     text-align: center;
     font-weight: 1.2rem;
+  }
+  .market-image{
+    width: 200px;
+    height: 250px;
+  }
+  .introduction{
+    text-align: left;
+  }
+  .open_time{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 30ch;
   }
 </style>
