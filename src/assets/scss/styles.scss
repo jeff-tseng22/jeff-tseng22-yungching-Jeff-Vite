@@ -8,13 +8,23 @@ body {
 }
 
 h1 {
+  text-align: center;
   color: $primary-color;
 }
+
+.page_link{
+  position: absolute;
+  right: 7.2rem;
+  top: 1.8rem;
+  font-size: 1.1rem;
+}
+
 table{
   width: 85%;
   height: 100%;
   margin: 0 auto;
   border-collapse: collapse;
+  border: 1px solid saddlebrown;
 }
 tr{
   text-align: center;
@@ -44,16 +54,13 @@ button {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
 }
-
 button:hover {
   background-color: $tertiary-color;
   transform: scale(1.05);
 }
-
 button:focus {
   outline: none;
 }
-
 button:active {
   background-color: $tertiary-color;
   transform: scale(0.98);
