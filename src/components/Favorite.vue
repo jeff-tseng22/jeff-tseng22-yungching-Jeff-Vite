@@ -5,6 +5,7 @@
       <RouterLink class="router" to="/" >首頁</RouterLink> |
       <RouterLink class="router" to="/list">資料列表</RouterLink>
     </div>
+    <button @click="confirmDelete" class="del_button">刪除選取資料</button>
     <table>
       <thead>
         <tr class="table_title">
@@ -27,6 +28,8 @@
             <input
               type="checkbox"
               :value="market.id"
+              :checked="isCheckedDelete(market.id)"
+              @change="handleCheckboxChange(market.id)"
             />
           </td>
           <td>
@@ -53,19 +56,43 @@
       <form @submit.prevent="saveEdit">
         <div>
           <label for="name">名稱:</label>
-          <input v-model="editForm.name" id="name" type="text" />
+          <input v-model="editForm.name" 
+            id="name" 
+            name="name" 
+            type="text"
+            @blur="validateField('name')"
+          />
+          <div v-if="formErrors.name" class="error">{{ formErrors.name }}</div>
         </div>
         <div>
           <label for="address">地址:</label>
-          <input v-model="editForm.address" id="address" type="text" />
+          <input v-model="editForm.address"
+            id="address" 
+            name="address" 
+            type="text" 
+            @blur="validateField('address')"
+          />
+          <div v-if="formErrors.address" class="error">{{ formErrors.address }}</div>
         </div>
         <div>
           <label for="tel">電話:</label>
-          <input v-model="editForm.tel" id="tel" type="text" />
+          <input v-model="editForm.tel"
+            id="tel" 
+            name="tel" 
+            type="text"
+            @blur="validateField('tel')"
+          />
+          <div class="error">{{ formErrors.tel }}</div>
         </div>
         <div>
           <label for="open_time">營業時間:</label>
-          <input v-model="editForm.open_time" id="open_time" type="text" />
+          <input v-model="editForm.open_time" 
+            id="open_time" 
+            name="open_time" 
+            type="text" 
+            @blur="validateField('open_time')"
+          />
+          <div class="error">{{ formErrors.open_time }}</div>
         </div>
         <button type="submit" class="edit_submit">儲存</button>
       </form>
@@ -82,7 +109,7 @@
 
 <script>
   // import axios from 'axios';
-  import { ref, computed } from "vue"
+  import { ref, computed, watch } from "vue"
   export default {
     name: 'List',
     setup() {
@@ -3221,6 +3248,8 @@
           }
         ]
       });
+      const saveIdToDelete = ref([]);
+      const selectedMarkets = ref(JSON.parse(localStorage.getItem('selectedMarkets')) || []);
       const editId = ref(null); 
       const editForm = ref({
         name: "",
@@ -3228,14 +3257,40 @@
         tel: "",
         open_time: "",
       });
+      const formErrors = ref({
+        name: "",
+        address: "",
+        tel: "",
+        open_time: "",
+      });
+      const confirmDelete = () => {
+        //本頁勾選刪除id
+        const saveIdToDelete = JSON.parse(localStorage.getItem('saveIdToDelete')) || [];
+        console.log("saveIdToDelete", saveIdToDelete);
+        //原始我的最愛id
+        let selectedMarkets = JSON.parse(localStorage.getItem('selectedMarkets')) || [];
+        //更新我的我的最愛id
+        selectedMarkets = selectedMarkets.filter(marketId => !saveIdToDelete.includes(marketId));
+        console.log("selectedMarkets", selectedMarkets);
+        localStorage.setItem('selectedMarkets', JSON.stringify(selectedMarkets));
+        localStorage.removeItem('saveIdToDelete');
+        //暫時替代方法
+        location.reload();
+      };
       const filteredData = computed(() => {
-        const selectedMarkets = JSON.parse(localStorage.getItem("selectedMarkets")) || [];
-        //selectedMarkets空值
-        if (!selectedMarkets.length) {
+        if (!selectedMarkets.value.length) {
           return [];
         }
-        return fake_res.value.data.filter((item) => selectedMarkets.includes(item.id));
+        return fake_res.value.data.filter((item) => selectedMarkets.value.includes(item.id));
       });
+      watch(
+        selectedMarkets,
+        (newSelectedMarkets) => {
+          console.log("selectedMarkets updated:", newSelectedMarkets);
+          localStorage.setItem('selectedMarkets', JSON.stringify(newSelectedMarkets));
+        },
+        { deep: true }
+      );
       const startEdit = (id) => {
         //filteredData必須是array
         if (!Array.isArray(filteredData.value)) {
@@ -3248,24 +3303,58 @@
           editForm.value = { ...market };
         }
       };
+      const validateField = (field) => {
+        if (field === 'name' && !editForm.value.name) {
+          formErrors.value.name = '名稱是必填的';
+        }
+        if (field === 'address' && !editForm.value.address) {
+          formErrors.value.address = '地址是必填的';
+        }
+        if (field === 'tel') {
+          if (!editForm.value.tel) {
+            formErrors.value.tel = '電話是必填的';
+          } else if (!/^\d{10}$/.test(editForm.value.tel)) {
+            formErrors.value.tel = '請輸入有效的電話號碼';
+          }
+        }
+        if (field === 'open_time' && !editForm.value.open_time) {
+          formErrors.value.open_time = '營業時間是必填的';
+        }
+        if (field === 'name' && editForm.value.name) {
+          formErrors.value.name = '';
+        }
+        if (field === 'address' && editForm.value.address) {
+          formErrors.value.address = '';
+        }
+        if (field === 'tel' && /^\d{10}$/.test(editForm.value.tel)) {
+          formErrors.value.tel = '';
+        }
+        if (field === 'open_time' && editForm.value.open_time) {
+          formErrors.value.open_time = '';
+        }
+      };
+
       const saveEdit = () => {
         //未編輯資料時, 則return
         if (editId.value === null) {
           return;
         }
+        //驗證資料格式後儲存
+        if (!validateField) {
+          return;
+        }
         // 找到對應的資料並更新
-  const index = fake_res.value.data.findIndex((item) => item.id === editId.value);
-  if (index !== -1) {
-    // 使用 splice 方法更新數據，這樣 Vue 的響應式系統能正確監控變更
-    fake_res.value.data.splice(index, 1, { ...editForm.value });
-  }
-
-  // 如果有使用 localStorage，更新選中的資料
-  const selectedMarkets = JSON.parse(localStorage.getItem("selectedMarkets")) || [];
-  if (!selectedMarkets.includes(editId.value)) {
-    selectedMarkets.push(editId.value); // 保證當市場被編輯後仍保留在 selectedMarkets 中
-  }
-  localStorage.setItem("selectedMarkets", JSON.stringify(selectedMarkets));
+        const index = fake_res.value.data.findIndex((item) => item.id === editId.value);
+        if (index !== -1) {
+          // 使用 splice 方法更新數據，這樣 Vue 的響應式系統能正確監控變更
+          fake_res.value.data.splice(index, 1, { ...editForm.value });
+        }
+        // 如果有使用 localStorage，更新選中的資料
+        const selectedMarkets = ref(JSON.parse(localStorage.getItem("selectedMarkets")) || []);
+        if (!selectedMarkets.includes(editId.value)) {
+          selectedMarkets.push(editId.value); // 保證當市場被編輯後仍保留在 selectedMarkets 中
+        }
+        localStorage.setItem("selectedMarkets", JSON.stringify(selectedMarkets));
         //清除編輯狀態
         editId.value = null;
         editForm.value = {
@@ -3296,8 +3385,13 @@
       return {
         fake_res,
         filteredData,
+        saveIdToDelete,
         editId,
         editForm,
+        confirmDelete,
+        validateField,
+        formErrors,
+        selectedMarkets,
         startEdit,
         saveEdit,
         pageSize,
@@ -3310,6 +3404,21 @@
       shortenText(text, length) {
         if (!text) return '';
         return text.length > length ? text.slice(0, length) + '...' : text;
+      },
+      isCheckedDelete(marketId) {
+        const selectedMarkets = JSON.parse(localStorage.getItem('saveIdToDelete')) || [];
+        return selectedMarkets.includes(marketId);
+      },
+      //選中刪除項目id儲存到localStorage
+      handleCheckboxChange(marketId) {
+        let selectedMarkets = JSON.parse(localStorage.getItem('saveIdToDelete')) || [];
+
+        if (selectedMarkets.includes(marketId)) {
+          selectedMarkets = selectedMarkets.filter(id => id !== marketId);
+        } else {
+          selectedMarkets.push(marketId);
+        }
+        localStorage.setItem('saveIdToDelete', JSON.stringify(selectedMarkets));
       },
     },
     mounted() {
@@ -3325,7 +3434,14 @@
     top: 1.8rem;
     font-size: 1.1rem;
   }
-
+  .del_button{
+    background-color: rgb(75, 14, 14);
+    margin-left: 4.5rem;
+    margin-bottom: .8rem;
+  }
+  .del_button:hover{
+    background-color: rgb(211, 50, 50);
+  }
   .favorite-image{
     width: 150px;
     height: 200px;
@@ -3354,6 +3470,9 @@
     position: relative;
     left: 40%;
     top: 0.6rem;
+  }
+  .error{
+    color: red;
   }
 
   .pagination{

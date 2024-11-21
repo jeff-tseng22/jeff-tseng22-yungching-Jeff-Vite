@@ -3252,17 +3252,17 @@
       const currentPage = ref(1); //預設頁面
       //總頁數
       const totalPages = computed(() => {
-        const totalItems = fake_res.value?.total ?? 0;
+        const totalItems = Array.isArray(filteredData.value) ? filteredData.value.length : 0;
         const size = pageSize.value || 1;
         return Math.ceil(totalItems / size);
       });
       const paginatedData = computed(() => {
-        if (!Array.isArray(fake_res.value.data)) {
+        if (!Array.isArray(filteredData.value.data)) {
           return [];
         }
       const startIndex = (currentPage.value - 1) * pageSize.value;
       const endIndex = Math.min(startIndex + pageSize.value, fake_res.value.data.length);
-        return fake_res.value.data.slice(startIndex, endIndex);
+        return filteredData.value.data.slice(startIndex, endIndex);
       });
 
       return {
@@ -3286,15 +3286,15 @@
         return selectedMarkets.includes(marketId);
       },
       handleCheckboxChange(marketId) {
-      const selectedMarkets = JSON.parse(localStorage.getItem('selectedMarkets')) || [];
-      if (selectedMarkets.includes(marketId)) {
-        const updatedMarkets = selectedMarkets.filter(id => id !== marketId);
-        localStorage.setItem('selectedMarkets', JSON.stringify(updatedMarkets));
-      } else {
-        selectedMarkets.push(marketId);
-        localStorage.setItem('selectedMarkets', JSON.stringify(selectedMarkets));
+        const selectedMarkets = JSON.parse(localStorage.getItem('selectedMarkets')) || [];
+        if (selectedMarkets.includes(marketId)) {
+          const updatedMarkets = selectedMarkets.filter(id => id !== marketId);
+          localStorage.setItem('selectedMarkets', JSON.stringify(updatedMarkets));
+        } else {
+          selectedMarkets.push(marketId);
+          localStorage.setItem('selectedMarkets', JSON.stringify(selectedMarkets));
+        }
       }
-  }
     },
     mounted() {
       // axios.get(`${this.corsURL}${this.apiURL}`, { params: this.params })
@@ -3311,12 +3311,6 @@
 </script>
 
 <style scoped lang="scss">
-  .page_link{
-    position: absolute;
-    right: 7.2rem;
-    top: 1.8rem;
-    font-size: 1.1rem;
-  }
   .list_select{
     margin-left: 8%;
     margin-bottom: 1.5rem;
@@ -3337,9 +3331,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 30ch;
-  }
-  table{
-    border: 1px solid saddlebrown;
   }
   .pagination{
     margin-top: 2rem;
