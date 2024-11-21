@@ -13,14 +13,13 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      'vue': 'vue/dist/vue.esm-bundler.js',
     },
   },
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@use "@/assets/scss/styles.scss" as *;`
-      }
-    }
-  }
+        additionalData: `@use "@/assets/scss/styles.scss" as *;`,
+      },
+    },
+  },
 })
