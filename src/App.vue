@@ -11,7 +11,7 @@
     <!-- 只有在首頁路由時才顯示 header -->
     <header v-if="isHomePage">
       <h1 class="interview_title">Jeff Tseng永慶房屋面試</h1>
-      <nav class="page_link">
+      <nav class="page_link_inedex">
         <RouterLink class="router" to="/" >首頁</RouterLink> |
         <RouterLink class="router" to="/list">資料列表</RouterLink> |
         <RouterLink class="router" to="/favorite">我的最愛列表</RouterLink>
@@ -30,8 +30,9 @@
     .interview_title{
       font-size: 2.3rem;
     }
-    .page_link{
-      font-size: 1.1rem;
+    .page_link_inedex{
+      font-size: 1.8rem;
+      text-align: center;
     }
     .router{
       color: black;
