@@ -39,7 +39,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="market in filteredData"
+          v-for="market in paginatedData"
           :key="market.id"
         >
           <td>
@@ -77,7 +77,7 @@
 
 <script>
   // import axios from 'axios';
-  import { ref, computed } from "vue"
+  import { ref, computed, watch } from "vue"
   export default {
     name: 'List',
     setup() {
@@ -3239,15 +3239,16 @@
       ]);
       const selectedCategoryId = ref("");
       const filteredData = computed(() => {
-      if (!selectedCategoryId.value) {
-        return fake_res.value.data || []; //未選擇
-      }
-      const selectedCategoryIdNum = parseInt(selectedCategoryId.value); //確認類別相同
-      //返回類別對應資料
-      return fake_res.value.data.filter(item => 
-        item.category.some(cat => cat.id === selectedCategoryIdNum)
-      );
-    });
+        //未選擇類別
+        if (!selectedCategoryId.value) {
+          return fake_res.value.data || []; //未選擇
+        }
+        const selectedCategoryIdNum = parseInt(selectedCategoryId.value); //確認類別相同
+        //返回類別對應資料
+        return fake_res.value.data.filter(item => 
+          item.category.some(cat => cat.id === selectedCategoryIdNum)
+        );
+      });
       const pageSize = ref(10); //每頁筆數
       const currentPage = ref(1); //預設頁面
       //總頁數
@@ -3257,12 +3258,17 @@
         return Math.ceil(totalItems / size);
       });
       const paginatedData = computed(() => {
-        if (!Array.isArray(filteredData.value.data)) {
+        // console.log("paginatedData", filteredData.value);
+        if (!Array.isArray(filteredData.value)) {
           return [];
         }
-      const startIndex = (currentPage.value - 1) * pageSize.value;
-      const endIndex = Math.min(startIndex + pageSize.value, fake_res.value.data.length);
-        return filteredData.value.data.slice(startIndex, endIndex);
+        const startIndex = (currentPage.value - 1) * pageSize.value;
+        const endIndex = Math.min(startIndex + pageSize.value, filteredData.value.length);
+        return filteredData.value.slice(startIndex, endIndex);
+      });
+      //切換類別時, 預設回到第一頁
+      watch(selectedCategoryId, (newCategoryId, oldCategoryId) => {
+        currentPage.value = 1;
       });
 
       return {
