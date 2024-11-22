@@ -21,7 +21,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="market in filteredData"
+          v-for="market in paginatedData"
           :key="market.id"
         >
           <td>
@@ -3369,17 +3369,25 @@
       const currentPage = ref(1); //預設頁面
       //總頁數
       const totalPages = computed(() => {
-        const totalItems = fake_res.value?.total ?? 0;
+        const selectedMarkets = JSON.parse(localStorage.getItem('selectedMarkets')) || [];
+        const filteredData = fake_res.value.data.filter(item =>
+          selectedMarkets.includes(item.id)
+        );
+        const totalItems = filteredData.length;
         const size = pageSize.value || 1;
         return Math.ceil(totalItems / size);
       });
       const paginatedData = computed(() => {
-        if (!Array.isArray(fake_res.value.data)) {
+        const selectedMarkets = JSON.parse(localStorage.getItem('selectedMarkets')) || [];
+        const filteredData = fake_res.value.data.filter(item =>
+          selectedMarkets.includes(item.id)
+        );
+        if (!Array.isArray(filteredData)) {
           return [];
-        }
-      const startIndex = (currentPage.value - 1) * pageSize.value;
-      const endIndex = Math.min(startIndex + pageSize.value, fake_res.value.data.length);
-        return fake_res.value.data.slice(startIndex, endIndex);
+        };
+        const startIndex = (currentPage.value - 1) * pageSize.value;
+        const endIndex = Math.min(startIndex + pageSize.value, filteredData.length);
+        return filteredData.slice(startIndex, endIndex);
       });
 
       return {
