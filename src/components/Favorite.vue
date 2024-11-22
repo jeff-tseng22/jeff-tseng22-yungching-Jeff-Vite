@@ -13,10 +13,10 @@
           <th>編輯資料</th>
           <th>圖片</th>
           <th>名稱</th>
-          <th>簡介</th>
-          <th>地址</th>
-          <th>電話</th>
-          <th>營業時間</th>
+          <th class="introduction">簡介</th>
+          <th class="address">地址</th>
+          <th class="tel">電話</th>
+          <th class="open_time">營業時間</th>
         </tr>
       </thead>
       <tbody>
@@ -45,7 +45,7 @@
           </td>
           <td>{{ market.name }}</td>
           <td class="introduction">{{ shortenText(market.introduction, 50) }}</td>
-          <td>{{ market.address }}</td>
+          <td class="address">{{ market.address }}</td>
           <td>{{ market.tel }}</td>
           <td class="open_time">{{ market.open_time }}</td>
         </tr>
@@ -3495,5 +3495,45 @@
     margin-top: 2rem;
     margin-bottom: 1.5rem;
     text-align: center;
+  }
+
+  //RWD-small device
+  @media (max-width: 768px) {
+    .page_link{
+      position: absolute;
+      top: 4.8rem;
+      right: 0;
+    }
+    .del_button{
+      position: relative;
+      right: 3.8rem;
+    }
+    .open_time,
+    .address,
+    .introduction{
+      display: none;
+    }
+    .edit_area{
+      position: relative;
+      left: 1rem;
+    }
+  }
+  //RWD-Tablet
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .page_link{
+      position: absolute;
+      top: 4.8rem;
+      right: 4.8rem;
+    }
+    .del_button{
+      position: relative;
+      right: .6rem;
+    }
+    .introduction{
+      display: none;
+    }
+    .edit_area{
+      left: 10%;
+    }
   }
 </style>
