@@ -3271,7 +3271,7 @@
         let selectedMarkets = JSON.parse(localStorage.getItem('selectedMarkets')) || [];
         //更新我的我的最愛id
         selectedMarkets = selectedMarkets.filter(marketId => !saveIdToDelete.includes(marketId));
-        console.log("selectedMarkets", selectedMarkets);
+        // console.log("selectedMarkets", selectedMarkets);
         localStorage.setItem('selectedMarkets', JSON.stringify(selectedMarkets));
         localStorage.removeItem('saveIdToDelete');
         //暫時替代方法
@@ -3326,7 +3326,7 @@
         if (field === 'address' && editForm.value.address) {
           formErrors.value.address = '';
         }
-        if (field === 'tel' && /^\d{10}$/.test(editForm.value.tel)) {
+        if (field === 'tel' && /^\+886-\d{1,2}-\d{8}(\#\d+)?$/.test(editForm.value.tel)) {
           formErrors.value.tel = '';
         }
         if (field === 'open_time' && editForm.value.open_time) {
@@ -3341,7 +3341,10 @@
         }
         //驗證資料格式後儲存
         if (!validateField) {
+          console.log("validate fail");
           return;
+        } else {
+          console.log("validate pass");
         }
         // 找到對應的資料並更新
         const index = fake_res.value.data.findIndex((item) => item.id === editId.value);
@@ -3351,10 +3354,15 @@
         }
         // 如果有使用 localStorage，更新選中的資料
         const selectedMarkets = ref(JSON.parse(localStorage.getItem("selectedMarkets")) || []);
-        if (!selectedMarkets.includes(editId.value)) {
-          selectedMarkets.push(editId.value); // 保證當市場被編輯後仍保留在 selectedMarkets 中
+        console.log("selectedMarkets", typeof(selectedMarkets));
+        if (typeof selectedMarkets !== 'object' || Array.isArray(selectedMarkets)) {
+          selectedMarkets = {};
         }
-        localStorage.setItem("selectedMarkets", JSON.stringify(selectedMarkets));
+        console.log("Before update:", selectedMarkets);
+        //新變數updatedSelectedMarkets儲存資料, 將更新後資料傳給後端
+        // if (!updatedSelectedMarkets.includes(editId.value)) {
+        //   updatedSelectedMarkets.push(editId.value);
+        // }
         //清除編輯狀態
         editId.value = null;
         editForm.value = {
