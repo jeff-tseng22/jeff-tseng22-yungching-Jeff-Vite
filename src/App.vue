@@ -10,7 +10,7 @@
   <div id="app">
     <!-- 只有在首頁路由時才顯示 header -->
     <header v-if="isHomePage">
-      <h1 class="interview_title">Jeff TsengXX房屋面試</h1>
+      <h1 class="interview_title">Jeff Tseng ＯＯ房屋面試題目</h1>
       <nav class="page_link_inedex">
         <RouterLink class="router" to="/" >首頁</RouterLink> |
         <RouterLink class="router" to="/list">資料列表</RouterLink> |
